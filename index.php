@@ -19,9 +19,15 @@
             echo json_encode($usuario); 
         });
         
-        $app->post('/usuarios/:name/:login/:password/:email', function ($name,$login,$password,$email) {
+        $app->post('/usuarios', function () {
             $system = new System();
             $system->loadUsers();
+            $request = \Slim\Slim::getInstance()->request();
+            $usuario = json_decode($request->getBody()); 
+            $name = $usuario->name;
+            $login = $usuario->login;
+            $password = $usuario->password;
+            $email = $usuario->email;
             $emaile = $system->checkEmail($email);
             $logine = $system->checkLogin($login);
             if($logine == 1 && $emaile == 1){
@@ -79,19 +85,12 @@
             echo json_encode($arr);
         });
         
-        $app->post('/categorias/:cat', function ($cat) {
+        $app->post('/categorias', function () {
             //$categoria = null;
             $system = new System();
-            /*if($query = mysqli_query($system->connection,"SELECT id,category FROM mylist_categories WHERE id = ".$id)){
-                $rowcount = mysqli_num_rows($query);               
-
-     
-                //echo "found $rowcount users";
-                for($i=0;$i<$rowcount;$i++){
-                  $struser = mysqli_fetch_array($query);
-                  $categoria = new Category($struser["id"],$struser["category"]);
-                }
-            }*/
+            $request = \Slim\Slim::getInstance()->request();
+            $categoria = json_decode($request->getBody()); 
+            $cat = $categoria->category;
             $query = mysqli_query($system->connection,"INSERT INTO mylist_categories (id, category) VALUES (NULL, '$cat')");
             $arr = array('success' => $query);
             echo json_encode($arr);
@@ -121,9 +120,14 @@
         });
         
         
-        $app->post('/tarefas/:uid/:category/:description', function ($uid, $category,$description) {
+        $app->post('/tarefas', function () {
             $system = new System();
-            $cid = $system->getCategoryId($category);
+            $request = \Slim\Slim::getInstance()->request();
+            $tarefa = json_decode($request->getBody()); 
+            $cid = $system->getCategoryId($tarefa->category);
+            $user = $tarefa->user;
+            $uid = $user->id;
+            $description = $tarefa->description;
             $query = mysqli_query($system->connection,"INSERT INTO mylist_tasks (id, user_id, category_id, description) VALUES (NULL, '$uid', '$cid', '$description')");
             $arr = array('success' => $query);
             echo json_encode($arr); 
