@@ -225,14 +225,14 @@ class System{
 
   function checkEmail($email){
     foreach($this->users as $user) {
-      if($user->email == $email) return new Error("Email já cadastrado!");
+      if($user->email == $email) return "Email já cadastrado!";
     }
     return 1;
   }
 
   function checkLogin($login){
     foreach($this->users as $user) {
-      if($user->login == $login) return new Error("Login já cadastrado!");
+      if($user->login == $login) return "Login já cadastrado!";
     }
     return 1;
   }
