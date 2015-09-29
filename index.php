@@ -43,6 +43,25 @@
             
         });
         
+        $app->put('/usuarios/:id', function ($id) {
+            $system = new System();
+            $system->loadUsers();
+            $request = \Slim\Slim::getInstance()->request();
+            $usuario = json_decode($request->getBody()); 
+            $name = $usuario->name;
+            $password = $usuario->password;
+            $query = mysqli_query($system->connection,"UPDATE mylist_users SET name='$name', password='$password' WHERE id = '$id'");
+            $arr = array('success' => $query);
+            echo json_encode($arr);           
+        });
+        
+        $app->delete('/usuarios/:id', function ($id) {
+            $system = new System();
+            $query = mysqli_query($system->connection, "DELETE FROM mylist_users WHERE id='$id'");
+            $arr = array('success' => $query);
+            echo json_encode($arr); 
+        });
+        
         $app->get('/usuarios/:id', function ($id) {
             $system = new System();
             foreach($system->users as $u) {
@@ -96,6 +115,17 @@
             echo json_encode($arr);
         });
         
+        $app->put('/categorias/:id', function ($id) {
+            //$categoria = null;
+            $system = new System();
+            $request = \Slim\Slim::getInstance()->request();
+            $categoria = json_decode($request->getBody()); 
+            $cat = $categoria->category;
+            $query = mysqli_query($system->connection,"UPDATE mylist_categories SET category='$cat' WHERE id = '$id'");
+            $arr = array('success' => $query);
+            echo json_encode($arr);
+        });
+        
         $app->delete('/categorias/:id', function ($id) {
             $system = new System();
             $query = mysqli_query($system->connection, "DELETE FROM mylist_categories WHERE id='$id'");
@@ -129,6 +159,19 @@
             $uid = $user->id;
             $description = $tarefa->description;
             $query = mysqli_query($system->connection,"INSERT INTO mylist_tasks (id, user_id, category_id, description) VALUES (NULL, '$uid', '$cid', '$description')");
+            $arr = array('success' => $query);
+            echo json_encode($arr); 
+        });
+        
+        $app->put('/tarefas/:id', function ($id) {
+            $system = new System();
+            $request = \Slim\Slim::getInstance()->request();
+            $tarefa = json_decode($request->getBody()); 
+            $cid = $system->getCategoryId($tarefa->category);
+            $user = $tarefa->user;
+            $uid = $user->id;
+            $description = $tarefa->description;
+            $query = mysqli_query($system->connection,"UPDATE mylist_tasks SET user_id = '$uid', category_id = '$cid', description = '$description' WHERE id = '$id'");
             $arr = array('success' => $query);
             echo json_encode($arr); 
         });
