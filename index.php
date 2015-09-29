@@ -79,6 +79,31 @@
             echo json_encode($arr);
         });
         
+        $app->post('/categorias/:cat', function ($cat) {
+            //$categoria = null;
+            $system = new System();
+            /*if($query = mysqli_query($system->connection,"SELECT id,category FROM mylist_categories WHERE id = ".$id)){
+                $rowcount = mysqli_num_rows($query);               
+
+     
+                //echo "found $rowcount users";
+                for($i=0;$i<$rowcount;$i++){
+                  $struser = mysqli_fetch_array($query);
+                  $categoria = new Category($struser["id"],$struser["category"]);
+                }
+            }*/
+            $query = mysqli_query($system->connection,"INSERT INTO mylist_categories (id, category) VALUES (NULL, '$cat')");
+            $arr = array('success' => $query);
+            echo json_encode($arr);
+        });
+        
+        $app->delete('/categorias/:id', function ($id) {
+            $system = new System();
+            $query = mysqli_query($system->connection, "DELETE FROM mylist_categories WHERE id='$id'");
+            $arr = array('success' => $query);
+            echo json_encode($arr); 
+        });
+        
         $app->get('/tarefas', function () {
             $system = new System();
             $tarefa = $system->tasks;
@@ -107,7 +132,6 @@
         
         $app->delete('/tarefas/:id', function ($id) {
             $system = new System();
-            $cid = $system->getCategoryId($category);
             $query = mysqli_query($system->connection, "DELETE FROM mylist_tasks WHERE id='$id'");
             $arr = array('success' => $query);
             echo json_encode($arr); 
