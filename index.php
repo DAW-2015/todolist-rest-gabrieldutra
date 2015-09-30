@@ -12,13 +12,22 @@
         \Slim\Slim::registerAutoloader();
         $app = new \Slim\Slim();
         $app->response->headers->set('ContentType','application/json');
+        // Visualização usuários
         $app->get('/usuarios', function () {
             $system = new System();
             $usuario = $system->users;
-            //echo $usuario->nome;
             echo json_encode($usuario); 
         });
         
+        // Visualização de usuário específico
+        $app->get('/usuarios/:id', function ($id) {
+            $system = new System();
+            foreach($system->users as $u) {
+                if($u->id == $id) echo json_encode($u);
+            }             
+        });
+        
+        // Cadastro de usuário
         $app->post('/usuarios', function () {
             $system = new System();
             $system->loadUsers();
@@ -37,12 +46,10 @@
                 if($emaile != 1){
                     echo json_encode(new Error($emaile));
                 } else echo json_encode(new Error($logine));
-            }
-            
-            //echo $usuario->nome;
-            
+            }            
         });
         
+        // Atualização de usuário
         $app->put('/usuarios/:id', function ($id) {
             $system = new System();
             $system->loadUsers();
@@ -55,6 +62,7 @@
             echo json_encode($arr);           
         });
         
+        // Exclusão de usuário
         $app->delete('/usuarios/:id', function ($id) {
             $system = new System();
             $query = mysqli_query($system->connection, "DELETE FROM mylist_users WHERE id='$id'");
@@ -62,23 +70,12 @@
             echo json_encode($arr); 
         });
         
-        $app->get('/usuarios/:id', function ($id) {
-            $system = new System();
-            foreach($system->users as $u) {
-                if($u->id == $id) echo json_encode($u);
-            }
-            //echo $usuario->nome;
-             
-        });
-        
+        // Visualização de categorias
         $app->get('/categorias', function () {
             $categorias = null;
             $system = new System();
             if($query = mysqli_query($system->connection,"SELECT id,category FROM mylist_categories")){
-                $rowcount = mysqli_num_rows($query);               
-
-     
-                //echo "found $rowcount users";
+                $rowcount = mysqli_num_rows($query);  
                 for($i=0;$i<$rowcount;$i++){
                   $struser = mysqli_fetch_array($query);
                   $categorias[sizeof($categorias)] = new Category($struser["id"],$struser["category"]);
@@ -87,25 +84,15 @@
             echo json_encode($categorias);
         });
         
+        // Visualizar o id de categoria (Recurso usado no ToDoList)
         $app->get('/categorias/:cat', function ($cat) {
-            //$categoria = null;
             $system = new System();
-            /*if($query = mysqli_query($system->connection,"SELECT id,category FROM mylist_categories WHERE id = ".$id)){
-                $rowcount = mysqli_num_rows($query);               
-
-     
-                //echo "found $rowcount users";
-                for($i=0;$i<$rowcount;$i++){
-                  $struser = mysqli_fetch_array($query);
-                  $categoria = new Category($struser["id"],$struser["category"]);
-                }
-            }*/
             $arr = array('id' => $system->getCategoryId($cat));
             echo json_encode($arr);
         });
         
+        // Cadastro de categoria
         $app->post('/categorias', function () {
-            //$categoria = null;
             $system = new System();
             $request = \Slim\Slim::getInstance()->request();
             $categoria = json_decode($request->getBody()); 
@@ -115,8 +102,8 @@
             echo json_encode($arr);
         });
         
+        // Atualização de categoria
         $app->put('/categorias/:id', function ($id) {
-            //$categoria = null;
             $system = new System();
             $request = \Slim\Slim::getInstance()->request();
             $categoria = json_decode($request->getBody()); 
@@ -126,6 +113,7 @@
             echo json_encode($arr);
         });
         
+        // Exclusão de categoria
         $app->delete('/categorias/:id', function ($id) {
             $system = new System();
             $query = mysqli_query($system->connection, "DELETE FROM mylist_categories WHERE id='$id'");
@@ -133,6 +121,7 @@
             echo json_encode($arr); 
         });
         
+        // Visualização de tarefas
         $app->get('/tarefas', function () {
             $system = new System();
             $tarefa = $system->tasks;
@@ -140,16 +129,15 @@
             echo json_encode($tarefa); 
         });
         
+        // Visualização de tarefa específica
         $app->get('/tarefas/:id', function ($id) {
             $system = new System();
             foreach($system->tasks as $t) {
                 if($t->id == $id) echo json_encode($t);
-            }
-            //echo $usuario->nome;
-             
+            }             
         });
         
-        
+        // Cadastro de tarefa
         $app->post('/tarefas', function () {
             $system = new System();
             $request = \Slim\Slim::getInstance()->request();
@@ -163,6 +151,7 @@
             echo json_encode($arr); 
         });
         
+        // Atualização de tarefa
         $app->put('/tarefas/:id', function ($id) {
             $system = new System();
             $request = \Slim\Slim::getInstance()->request();
@@ -176,7 +165,7 @@
             echo json_encode($arr); 
         });
         
-        
+        // Exclusão de tarefa
         $app->delete('/tarefas/:id', function ($id) {
             $system = new System();
             $query = mysqli_query($system->connection, "DELETE FROM mylist_tasks WHERE id='$id'");
